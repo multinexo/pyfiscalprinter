@@ -7,6 +7,7 @@ import unicodedata
 import driver
 from generic import PrinterInterface, PrinterException
 from math import ceil
+from math import floor
 
 
 class FiscalPrinterError(Exception):
@@ -290,7 +291,7 @@ class EpsonPrinter(PrinterInterface):
             # enviar con el iva incluido
             if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
                 # nota de crédito?
-                priceUnitStr = str(int(math.floor(price * 100, 0)))
+                priceUnitStr = str(int(floor(price * 100, 0)))
             else:
                 priceUnitStr = str(int(round(price * 100, 0)))
         else:
@@ -304,7 +305,7 @@ class EpsonPrinter(PrinterInterface):
                 # enviar sin el iva (factura A)
                 if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
                     # nota de crédito?
-                    priceUnitStr = str(int(math.floor(net * 100, 0)))
+                    priceUnitStr = str(int(floor(net * 100, 0)))
                 else:
                     priceUnitStr = str(int(round(net * 100, 0)))
         ivaStr = str(int(iva * 100))
