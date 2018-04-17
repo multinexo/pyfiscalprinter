@@ -365,14 +365,14 @@ class EpsonPrinter(PrinterInterface):
         if self._currentDocumentType != 'A':
             # enviar con el iva incluido
             if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
-                priceUnitStr = str(int(ceil(priceUnit * 100, 0)))
+                priceUnitStr = str(int(ceil(priceUnit * 100)))
             else:
                 priceUnitStr = str(int(round(priceUnit * 100, 0)))
             print 'currentDocumentType != A: priceUnitStr ==================> ', priceUnitStr
         else:
             # enviar sin el iva (factura A)
             if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
-                priceUnitStr = str(int(ceil((priceUnit / ((100.0 + iva) / 100)) * 100, 0)))
+                priceUnitStr = str(int(ceil((priceUnit / ((100.0 + iva) / 100)) * 100)))
             else:
                 priceUnitStr = str(int(round((priceUnit / ((100.0 + iva) / 100)) * 100, 0)))
             print 'currentDocumentType == A: priceUnitStr ==================> ', priceUnitStr
