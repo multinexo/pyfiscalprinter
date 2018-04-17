@@ -295,10 +295,7 @@ class EpsonPrinter(PrinterInterface):
             else:
                 priceUnitStr = str(int(round(price * 100, 0)))
         else:
-            print '=========== price ==============>', price
             net = price / ((100.0 + iva) / 100.0)
-            print '=========== net ===============>', net
-            print 'round_up? ===> ', round_up
             if round_up:
                 net = self.float_round_up(net, 2)
             if self.model == "tm-220-af":
@@ -308,8 +305,6 @@ class EpsonPrinter(PrinterInterface):
                 # enviar sin el iva (factura A)
                 if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
                     # nota de crédito?
-                    print '----------------net ---------->', net
-                    print '-----------------FLOOR =>', str(int(floor(net * 100))), '------------'
                     priceUnitStr = str(int(floor(net * 100)))
                 else:
                     priceUnitStr = str(int(round(net * 100, 0)))
@@ -368,14 +363,12 @@ class EpsonPrinter(PrinterInterface):
                 priceUnitStr = str(int(ceil(priceUnit * 100)))
             else:
                 priceUnitStr = str(int(round(priceUnit * 100, 0)))
-            print 'currentDocumentType != A: priceUnitStr ==================> ', priceUnitStr
         else:
             # enviar sin el iva (factura A)
             if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
                 priceUnitStr = str(int(ceil((priceUnit / ((100.0 + iva) / 100)) * 100)))
             else:
                 priceUnitStr = str(int(round((priceUnit / ((100.0 + iva) / 100)) * 100, 0)))
-            print 'currentDocumentType == A: priceUnitStr ==================> ', priceUnitStr
         ivaStr = str(int(iva * 100))
         extraparams = self._currentDocument in (self.CURRENT_DOC_BILL_TICKET,
             self.CURRENT_DOC_CREDIT_TICKET) and ["", "", ""] or []
