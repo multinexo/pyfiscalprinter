@@ -353,7 +353,7 @@ class EpsonPrinter(PrinterInterface):
             priceUnitStr = str(int(round(priceUnit * 100, 0)))
         else:
             # enviar sin el iva (factura A)
-            priceUnitStr = str(int(round((priceUnit / ((100 + iva) / 100)) * 100, 0)))
+            priceUnitStr = str(int(round((priceUnit / ((100.0 + iva) / 100)) * 100, 0)))
         ivaStr = str(int(iva * 100))
         extraparams = self._currentDocument in (self.CURRENT_DOC_BILL_TICKET,
             self.CURRENT_DOC_CREDIT_TICKET) and ["", "", ""] or []
