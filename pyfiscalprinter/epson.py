@@ -295,7 +295,9 @@ class EpsonPrinter(PrinterInterface):
             else:
                 priceUnitStr = str(int(round(price * 100, 0)))
         else:
+            print '=========== price ==============>', price
             net = price / ((100.0 + iva) / 100.0)
+            print '=========== net ===============>', net
             if round_up:
                 net = self.float_round_up(net, 2)
             if self.model == "tm-220-af":
