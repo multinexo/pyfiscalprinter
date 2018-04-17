@@ -304,7 +304,7 @@ class EpsonPrinter(PrinterInterface):
                 # enviar sin el iva (factura A)
                 if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
                     # nota de crédito?
-                    priceUnitStr = str(int(floor(net * 100, 0)))
+                    priceUnitStr = str(int(math.floor(net * 100, 0)))
                 else:
                     priceUnitStr = str(int(round(net * 100, 0)))
         ivaStr = str(int(iva * 100))
