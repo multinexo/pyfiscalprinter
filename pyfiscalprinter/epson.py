@@ -298,6 +298,7 @@ class EpsonPrinter(PrinterInterface):
             print '=========== price ==============>', price
             net = price / ((100.0 + iva) / 100.0)
             print '=========== net ===============>', net
+            print 'round_up? ===> ', round_up
             if round_up:
                 net = self.float_round_up(net, 2)
             if self.model == "tm-220-af":
@@ -307,6 +308,7 @@ class EpsonPrinter(PrinterInterface):
                 # enviar sin el iva (factura A)
                 if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
                     # nota de crédito?
+                    print '----------------net ---------->', net
                     print '-----------------FLOOR =>', str(int(floor(net * 100))), '------------'
                     priceUnitStr = str(int(floor(net * 100)))
                 else:
