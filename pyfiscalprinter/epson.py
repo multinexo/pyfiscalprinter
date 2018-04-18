@@ -7,6 +7,7 @@ import unicodedata
 import driver
 from generic import PrinterInterface, PrinterException
 from math import ceil
+from math import floor
 
 
 class FiscalPrinterError(Exception):
@@ -288,7 +289,11 @@ class EpsonPrinter(PrinterInterface):
             bultosStr = "0" * 5  # No se usa en TM220AF ni TM300AF ni TMU220AF
         if self._currentDocumentType != 'A':
             # enviar con el iva incluido
-            priceUnitStr = str(int(round(price * 100, 0)))
+            if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
+                # nota de crédito?
+                priceUnitStr = str(int(floor(price * 100)))
+            else:
+                priceUnitStr = str(int(round(price * 100, 0)))
         else:
             net = price / ((100.0 + iva) / 100.0)
             if round_up:
@@ -298,7 +303,11 @@ class EpsonPrinter(PrinterInterface):
                 priceUnitStr = "%0.4f" % net
             else:
                 # enviar sin el iva (factura A)
-                priceUnitStr = str(int(round(net * 100, 0)))
+                if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
+                    # nota de crédito?
+                    priceUnitStr = str(int(floor(net * 100)))
+                else:
+                    priceUnitStr = str(int(round(net * 100, 0)))
         ivaStr = str(int(iva * 100))
         if long_description:
             description = self.truncate_description(description)
@@ -350,10 +359,16 @@ class EpsonPrinter(PrinterInterface):
         priceUnit = amount
         if self._currentDocumentType != 'A':
             # enviar con el iva incluido
-            priceUnitStr = str(int(round(priceUnit * 100, 0)))
+            if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
+                priceUnitStr = str(int(ceil(priceUnit * 100)))
+            else:
+                priceUnitStr = str(int(round(priceUnit * 100, 0)))
         else:
             # enviar sin el iva (factura A)
-            priceUnitStr = str(int(round((priceUnit / ((100 + iva) / 100)) * 100, 0)))
+            if self._currentDocument == self.CURRENT_DOC_CREDIT_TICKET:
+                priceUnitStr = str(int(ceil((priceUnit / ((100.0 + iva) / 100)) * 100)))
+            else:
+                priceUnitStr = str(int(round((priceUnit / ((100.0 + iva) / 100)) * 100, 0)))
         ivaStr = str(int(iva * 100))
         extraparams = self._currentDocument in (self.CURRENT_DOC_BILL_TICKET,
             self.CURRENT_DOC_CREDIT_TICKET) and ["", "", ""] or []
