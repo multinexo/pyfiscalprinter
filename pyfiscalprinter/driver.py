@@ -303,7 +303,7 @@ class HasarFiscalDriver( EpsonFiscalDriver ):
                 elif reply[1] != chr( self._sequenceNumber ): # Los número de seq no coinciden
                     # Reenvío el mensaje
                     self._write( self.ACK )
-                    #self._sendAndWaitAck( message )
+                    self._sendAndWaitAck( message )
                     timeout = time.time() + self.WAIT_TIME
                     retries +=1
                     if retries > self.RETRIES:
