@@ -66,6 +66,7 @@ class HasarPrinter(PrinterInterface):
 
     CMD_PRINT_TEXT_IN_FISCAL = 0x41
     CMD_PRINT_LINE_ITEM = 0x42
+    CMD_ADD_PERCEPTION = 0x60
     CMD_PRINT_SUBTOTAL = 0x43
     CMD_ADD_PAYMENT = 0x44
     CMD_CLOSE_FISCAL_RECEIPT = 0x45
@@ -427,6 +428,38 @@ class HasarPrinter(PrinterInterface):
     def openDrawer(self):
         if not self.model in ("320", "615"):
             self._sendCommand(self.CMD_OPEN_DRAWER, [])
+
+    def addTax(self, tax_id, description, amount, rate=None):
+        """Agrega un otros tributos (i.e. percepci�n) a la FC.
+            @param description  Descripci�n
+            @param amount       Importe
+            @param iva          Porcentaje de Iva (si corresponde)
+            @param tax_id       C�digo de Impuesto (ver 2da Generaci�n)
+        """
+        if tax_id in (6, ):
+            # Percepci�n de IVA a una tasa (cod 6) / Percepci�n Global de IVA
+            pass
+        elif tax_id in (5, 7, 8, 9):
+            # Otro tipo de Percepci�n (cod 9)
+            rate = None
+        else:
+            raise NotImplementedError("El c�digo de impuesto no est� implementado")
+
+        amountStr = str(amount).replace(",", ".")
+        if rate:
+            ivaStr = str(float(rate)).replace(",", ".")
+        else:
+            ivaStr = "**.**"
+        reply = self._sendCommand(self.CMD_ADD_PERCEPTION,
+                          [ivaStr, formatText(description[:20]), amountStr])
+        return reply
+
+    def subtotal(self, print_text=True, display=True, text=""):
+        if self._currentDocument in (self.CURRENT_DOC_TICKET, self.CURRENT_DOC_BILL_TICKET,
+                self.CURRENT_DOC_CREDIT_BILL_TICKET, self.CURRENT_DOC_CREDIT_TICKET):
+            status = self._sendCommand(self.CMD_PRINT_SUBTOTAL, ["P" if print_text else "O", "X", "1" if display else "0"])
+            return status
+        raise NotImplementedError
 
     def dailyClose(self, type):
         reply = self._sendCommand(self.CMD_DAILY_CLOSE, [type])
