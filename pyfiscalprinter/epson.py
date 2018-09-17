@@ -106,8 +106,7 @@ class EpsonPrinter(PrinterInterface):
         print "_sendCommand", commandNumber, parameters
         try:
             logging.getLogger().info("sendCommand: SEND|0x%x|%s|%s" % (commandNumber,
-                skipStatusErrors and "T" or "F",
-                                                                     str(parameters)))
+                skipStatusErrors and "T" or "F", str(parameters)))
             return self.driver.sendCommand(commandNumber, parameters, skipStatusErrors)
         except driver.PrinterException, e:
             logging.getLogger().error("epsonFiscalDriver.PrinterException: %s" % str(e))
