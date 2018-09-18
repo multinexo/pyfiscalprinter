@@ -29,12 +29,12 @@ try {
         exit(1);
     }
 
-    # Iniciar conexi�n con el controlador fiscal:
+    # Iniciar conexión con el controlador fiscal:
     $marca = "epson";            // configurar "hasar" o "epson"
     $modelo = "epsonlx300+";     // "tickeadoras", "epsonlx300+", "tm-220-af"
                                  // "615", "715v1", "715v2", "320"
     $puerto = "dummy";           // "COM1", "COM2", etc. o "/dev/ttyS0" en linux
-    $equipo = "";                // IP si no esta conectada a esta m�quina
+    $equipo = "";                // IP si no esta conectada a esta máquina
     $ok = $ctrl->Conectar($marca, $modelo, $puerto, $equipo);
 
     # Analizar errores (si no se habilito lanzar excepciones)
@@ -44,8 +44,8 @@ try {
         exit(1);
     }
 
-    # Consultar el �ltimo n�mero de comprobante impreso por el controlador:
-    # IMPORTANTE: en modo dummy solicita el n�mero de comprobante por consola
+    # Consultar el último número de comprobante impreso por el controlador:
+    # IMPORTANTE: en modo dummy solicita el número de comprobante por consola
     $tipo_cbte = 83;
     $ult = $ctrl->ConsultarUltNro($tipo_cbte);
     echo "Ultimo Nro de Cbte {$ult}\n";
@@ -65,7 +65,7 @@ try {
                                   $referencia);
     echo "Abrir Comprobante = {$ok}\n";
 
-    # Imprimo un art�culo:
+    # Imprimo un artículo:
     $codigo = "P0001";
     $ds = "Descripcion del producto P0001";
     $qty = 1.00;
