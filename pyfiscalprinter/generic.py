@@ -13,39 +13,39 @@ class PrinterInterface:
         raise NotImplementedError
 
     def printNonFiscalText(self, text):
-        """Imprime texto fiscal. Si supera el l�mite de la linea se trunca."""
+        """Imprime texto fiscal. Si supera el límite de la linea se trunca."""
         raise NotImplementedError
 
     NON_FISCAL_TEXT_MAX_LENGTH = 40  # Redefinir
 
     def closeDocument(self):
-        """Cierra el documento que est� abierto"""
+        """Cierra el documento que está abierto"""
         raise NotImplementedError
 
     def cancelDocument(self):
-        """Cancela el documento que est� abierto"""
+        """Cancela el documento que está abierto"""
         raise NotImplementedError
 
     def addItem(self, description, quantity, price, iva, discount, discountDescription, negative=False,
                 long_description=False, round_up=False):
         """Agrega un item a la FC.
-            @param description          Descripci�n del item. Puede ser un string o una lista.
-                Si es una lista cada valor va en una l�nea.
+            @param description          Descripción del item. Puede ser un string o una lista.
+                Si es una lista cada valor va en una línea.
             @param quantity             Cantidad
             @param price                Precio (incluye el iva si la FC es B o C, si es A no lo incluye)
             @param iva                  Porcentaje de iva
             @param discount             Importe de descuento
-            @param discountDescription  Descripci�n del descuento
+            @param discountDescription  Descripción del descuento
             @param negative             True->Resta de la FC
-            @param long_description     Descripci�n hasta 78 caracteres
-            @param round_up             Corrige el error por redondeo, haciendolo hac�a arriba y
+            @param long_description     Descripción hasta 78 caracteres
+            @param round_up             Corrige el error por redondeo, haciéndolo hacia arriba y
                 bonificando la diferencia
         """
         raise NotImplementedError
 
     def addPayment(self, description, payment):
         """Agrega un pago a la FC.
-            @param description  Descripci�n
+            @param description  Descripción
             @param payment      Importe
         """
         raise NotImplementedError
@@ -92,7 +92,7 @@ class PrinterInterface:
             @param  type        Tipo de Factura "A", "B", o "C"
             @param  name        Nombre del cliente
             @param  address     Domicilio
-            @param  doc         Documento del cliente seg�n docType
+            @param  doc         Documento del cliente según docType
             @param  docType     Tipo de documento
             @param  ivaType     Tipo de IVA
         """
@@ -104,7 +104,7 @@ class PrinterInterface:
             @param  type        Tipo de Factura "A", "B", o "C"
             @param  name        Nombre del cliente
             @param  address     Domicilio
-            @param  doc         Documento del cliente seg�n docType
+            @param  doc         Documento del cliente según docType
             @param  docType     Tipo de documento
             @param  ivaType     Tipo de IVA
             @param  reference
@@ -113,11 +113,11 @@ class PrinterInterface:
 
     def openDebitNoteTicket(self, type, name, address, doc, docType, ivaType):
         """
-        Abre una Nota de D�bito
+        Abre una Nota de Débito
             @param  type        Tipo de Factura "A", "B", o "C"
             @param  name        Nombre del cliente
             @param  address     Domicilio
-            @param  doc         Documento del cliente seg�n docType
+            @param  doc         Documento del cliente según docType
             @param  docType     Tipo de documento
             @param  ivaType     Tipo de IVA
             @param  reference
@@ -129,7 +129,7 @@ class PrinterInterface:
         Abre un remito
             @param  name        Nombre del cliente
             @param  address     Domicilio
-            @param  doc         Documento del cliente seg�n docType
+            @param  doc         Documento del cliente según docType
             @param  docType     Tipo de documento
             @param  ivaType     Tipo de IVA
         """
@@ -140,16 +140,16 @@ class PrinterInterface:
         Abre un recibo
             @param  name        Nombre del cliente
             @param  address     Domicilio
-            @param  doc         Documento del cliente seg�n docType
+            @param  doc         Documento del cliente según docType
             @param  docType     Tipo de documento
             @param  ivaType     Tipo de IVA
-            @param  number      N�mero de identificaci�n del recibo (arbitrario)
+            @param  number      Número de identificación del recibo (arbitrario)
         """
         raise NotImplementedError
 
     def addRemitItem(self, description, quantity):
         """Agrega un item al remito
-            @param description  Descripci�n
+            @param description  Descripción
             @param quantity     Cantidad
         """
         raise NotImplementedError
@@ -163,22 +163,22 @@ class PrinterInterface:
 
     def addAdditional(self, description, amount, iva, negative=False):
         """Agrega un adicional a la FC.
-            @param description  Descripci�n
+            @param description  Descripción
             @param amount       Importe (sin iva en FC A, sino con IVA)
             @param iva          Porcentaje de Iva
             @param negative True->Descuento, False->Recargo"""
         raise NotImplementedError
 
     def getLastNumber(self, letter):
-        """Obtiene el �ltimo n�mero de FC"""
+        """Obtiene el último número de FC"""
         raise NotImplementedError
 
     def getLastCreditNoteNumber(self, letter):
-        """Obtiene el �ltimo n�mero de FC"""
+        """Obtiene el último número de FC"""
         raise NotImplementedError
 
     def getLastRemitNumber(self):
-        """Obtiene el �ltimo n�mero de Remtio"""
+        """Obtiene el último número de Remtio"""
         raise NotImplementedError
 
     def cancelAnyDocument(self):
@@ -194,20 +194,20 @@ class PrinterInterface:
         raise NotImplementedError
 
     def auditByDate(self, date_from, date_to, type):
-        """Auditor�a por rango de fechas
-            @param date_from    Fecha de inicio de selecci�n AAMMDD
-            @param date_to      Fecha de fin de selecci�n AAMMDD
+        """Auditoría por rango de fechas
+            @param date_from    Fecha de inicio de selección AAMMDD
+            @param date_to      Fecha de fin de selección AAMMDD
             @param type         'T' (Reporte de Contador resumido), 'D' (Reporte de Contador con detalles),
-                                't' (Informe de Auditor�a resumido), 'd' (Informe de Auditor�a con detalles)
+                                't' (Informe de Auditoría resumido), 'd' (Informe de Auditoría con detalles)
         """
         raise NotImplementedError
 
     def auditByClosure(self, close_from, close_to, type):
-        """Auditor�a por rango de comprobantes de cierre
-            @param close_from    N�mero de Cierre 'Z' inicial del rango elegido.
-            @param close_to      N�mero de Cierre 'Z' final del rango elegido.
+        """Auditoría por rango de comprobantes de cierre
+            @param close_from    Número de Cierre 'Z' inicial del rango elegido.
+            @param close_to      Número de Cierre 'Z' final del rango elegido.
             @param type         'T' (Reporte de Contador resumido), 'D' (Reporte de Contador con detalles),
-                                't' (Informe de Auditor�a resumido), 'd' (Informe de Auditor�a con detalles)
+                                't' (Informe de Auditoría resumido), 'd' (Informe de Auditoría con detalles)
         """
         raise NotImplementedError
 
@@ -219,9 +219,9 @@ class PrinterInterface:
         return []
 
     def openDrawer(self):
-        """Abrir caj�n del dinero - No es mandatory implementarlo"""
+        """Abrir cajón del dinero - No es mandatory implementarlo"""
         pass
 
     def getSubtotal(self, print_subtotal=True):
-        """Toma el subtotal, usado para obtener la informaci�n que fue enviada a la FC"""
+        """Toma el subtotal, usado para obtener la información que fue enviada a la FC"""
         raise NotImplementedError

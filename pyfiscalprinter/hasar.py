@@ -152,7 +152,7 @@ class HasarPrinter(PrinterInterface):
                 deviceFile = deviceFile or 0
                 self.driver = driver.HasarFiscalDriver(deviceFile, speed)
         except Exception, e:
-            raise FiscalPrinterError("Imposible establecer comunicaci�n.", e)
+            raise FiscalPrinterError("Imposible establecer comunicación.", e)
         self.model = model
 
     def _sendCommand(self, commandNumber, parameters=(), skipStatusErrors=False):
@@ -176,7 +176,7 @@ class HasarPrinter(PrinterInterface):
             return (fiscalStatus & (1 << 13)) == (1 << 13)
 
         if not checkStatusInComprobante(status[1]):
-            # No tom� el comando, el status fiscal dice que no hay comprobante abierto, intento de nuevo
+            # No tomó el comando, el status fiscal dice que no hay comprobante abierto, intento de nuevo
             status = self._sendCommand(self.CMD_OPEN_NON_FISCAL_RECEIPT, [])
             if not checkStatusInComprobante(status[1]):
                 raise PrinterException("Error de la impresora fiscal, no acepta el comando de iniciar "
@@ -220,7 +220,7 @@ class HasarPrinter(PrinterInterface):
             header = []
         line = 3
         for text in (header + [chr(0x7f)]*3)[:3]: # Agrego chr(0x7f) (DEL) al final para limpiar las
-                                                  # l�neas no utilizadas
+                                                  # líneas no utilizadas
             self._setHeaderTrailer(line, text)
             line += 1
 
@@ -248,7 +248,7 @@ class HasarPrinter(PrinterInterface):
         ivaType = self.ivaTypeMap.get(ivaType, "C")
         if ivaType != "C" and (not doc or docType != self.DOC_TYPE_CUIT):
             raise ValidationError("Error, si el tipo de IVA del cliente NO es consumidor final, "
-                "debe ingresar su n�mero de CUIT.")
+                "debe ingresar su número de CUIT.")
         parameters = [self._formatText(name, 'customerName'),
                        doc or " ",
                        ivaType,   # Iva Comprador
@@ -391,7 +391,7 @@ class HasarPrinter(PrinterInterface):
 
     def addAdditional(self, description, amount, iva, negative=False):
         """Agrega un adicional a la FC.
-            @param description  Descripci�n
+            @param description  Descripción
             @param amount       Importe (sin iva en FC A, sino con IVA)
             @param iva          Porcentaje de Iva
             @param negative True->Descuento, False->Recargo"""
@@ -430,20 +430,20 @@ class HasarPrinter(PrinterInterface):
             self._sendCommand(self.CMD_OPEN_DRAWER, [])
 
     def addTax(self, tax_id, description, amount, rate=None):
-        """Agrega un otros tributos (i.e. percepci�n) a la FC.
-            @param description  Descripci�n
+        """Agrega un otros tributos (i.e. percepción) a la FC.
+            @param description  Descripción
             @param amount       Importe
             @param iva          Porcentaje de Iva (si corresponde)
-            @param tax_id       C�digo de Impuesto (ver 2da Generaci�n)
+            @param tax_id       Código de Impuesto (ver 2da Generación)
         """
         if tax_id in (6, ):
-            # Percepci�n de IVA a una tasa (cod 6) / Percepci�n Global de IVA
+            # Percepción de IVA a una tasa (cod 6) / Percepción Global de IVA
             pass
         elif tax_id in (5, 7, 8, 9):
-            # Otro tipo de Percepci�n (cod 9)
+            # Otro tipo de Percepción (cod 9)
             rate = None
         else:
-            raise NotImplementedError("El c�digo de impuesto no est� implementado")
+            raise NotImplementedError("El código de impuesto no está implementado")
 
         amountStr = str(amount).replace(",", ".")
         if rate:
@@ -468,8 +468,8 @@ class HasarPrinter(PrinterInterface):
     def getLastNumber(self, letter):
         reply = self._sendCommand(self.CMD_STATUS_REQUEST, [], True)
         if len(reply) < 3:
-            # La respuesta no es v�lida. Vuelvo a hacer el pedido y
-            #si hay alg�n error que se reporte como excepci�n
+            # La respuesta no es válida. Vuelvo a hacer el pedido y
+            #si hay algún error que se reporte como excepción
             reply = self._sendCommand(self.CMD_STATUS_REQUEST, [], False)
         if letter == "A":
             return int(reply[4])
@@ -479,8 +479,8 @@ class HasarPrinter(PrinterInterface):
     def getLastCreditNoteNumber(self, letter):
         reply = self._sendCommand(self.CMD_STATUS_REQUEST, [], True)
         if len(reply) < 3:
-            # La respuesta no es v�lida. Vuelvo a hacer el pedido y
-            #si hay alg�n error que se reporte como excepci�n
+            # La respuesta no es válida. Vuelvo a hacer el pedido y
+            #si hay algún error que se reporte como excepción
             reply = self._sendCommand(self.CMD_STATUS_REQUEST, [], False)
         if letter == "A":
             return int(reply[7])
@@ -490,8 +490,8 @@ class HasarPrinter(PrinterInterface):
     def getLastRemitNumber(self):
         reply = self._sendCommand(self.CMD_STATUS_REQUEST, [], True)
         if len(reply) < 3:
-            # La respuesta no es v�lida. Vuelvo a hacer el pedido y si
-            #hay alg�n error que se reporte como excepci�n
+            # La respuesta no es válida. Vuelvo a hacer el pedido y si
+            #hay algún error que se reporte como excepción
             reply = self._sendCommand(self.CMD_STATUS_REQUEST, [], False)
         return int(reply[8])
 
@@ -524,8 +524,8 @@ class HasarPrinter(PrinterInterface):
         reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL, [print_subtotal, "Subtotal"], True)
 
         if len(reply) < 3:
-            # La respuesta no es v�lida. Vuelvo a hacer el pedido y
-            #  si hay alg�n error que se reporte como excepci�n
+            # La respuesta no es válida. Vuelvo a hacer el pedido y
+            #  si hay algún error que se reporte como excepción
             reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL, [print_subtotal, "Subtotal"], False)
         return reply[2:]
 
@@ -535,7 +535,7 @@ class HasarPrinter(PrinterInterface):
         printerStatus = reply[0]
         x = int(printerStatus, 16)
         if ((1 << 4) & x) == (1 << 4):
-            ret.append("Poco papel para la cinta de auditor�a")
+            ret.append("Poco papel para la cinta de auditoría")
         if ((1 << 5) & x) == (1 << 5):
             ret.append("Poco papel para comprobantes o tickets")
         return ret
@@ -552,7 +552,7 @@ class HasarPrinter(PrinterInterface):
 
     def truncate_description(self, product_name):
         """
-        Divide la descripci�n en array de n strings
+        Divide la descripción en array de n strings
         """
         text = formatText(product_name[:78])
         n = 26

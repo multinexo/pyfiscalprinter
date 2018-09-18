@@ -38,7 +38,7 @@ class DummyDriver:
 
     def __init__(self):
         try:
-            self.number = int(raw_input("Ingrese el n�mero de la �ltima factura: "))
+            self.number = int(raw_input("Ingrese el número de la última factura: "))
         except EOFError:
             # iniciar desde 0 (ejecutando sin stdin)
             self.number = 0
@@ -94,7 +94,7 @@ class EpsonPrinter(PrinterInterface):
                 deviceFile = deviceFile or 0
                 self.driver = driver.EpsonFiscalDriver(deviceFile, speed)
         except Exception as e:
-            raise FiscalPrinterError("Imposible establecer comunicaci�n.", e)
+            raise FiscalPrinterError("Imposible establecer comunicación.", e)
         if not model:
             self.model = "tickeadoras"
         else:
@@ -147,7 +147,7 @@ class EpsonPrinter(PrinterInterface):
             header = []
         line = 3
         for text in (header + [chr(0x7f)]*3)[:3]: # Agrego chr(0x7f) (DEL) al final para limpiar las
-                                                  # l�neas no utilizadas
+                                                  # líneas no utilizadas
             self._setHeaderTrailer(line, text)
             line += 1
 
@@ -184,12 +184,12 @@ class EpsonPrinter(PrinterInterface):
             else:
                 reference = ""
         if self.model == "epsonlx300+":
-            parameters = [isCreditNote and "N" or "F", # Por ahora no soporto ND, que ser�a "D"
+            parameters = [isCreditNote and "N" or "F", # Por ahora no soporto ND, que sería "D"
                 "C",
                 type, # Tipo de FC (A/B/C)
                 "1",   # Copias - Ignorado
                 "P",   # "P" la impresora imprime la lineas(hoja en blanco) o "F" preimpreso
-                "17",   # Tama�o Carac - Ignorado
+                "17",   # Tamaño Carac - Ignorado
                 "I",   # Responsabilidad en el modo entrenamiento - Ignorado
                 self.ivaTypeMap.get(ivaType, "F"),   # Iva Comprador
                 formatText(name[:40]), # Nombre
@@ -212,7 +212,7 @@ class EpsonPrinter(PrinterInterface):
                 type, # Tipo de FC (A/B/C)
                 "1",   # Copias - Ignorado
                 "P",   # Tipo de Hoja - Ignorado
-                "17",   # Tama�o Carac - Ignorado
+                "17",   # Tamaño Carac - Ignorado
                 "E",   # Responsabilidad en el modo entrenamiento - Ignorado
                 self.ivaTypeMap.get(ivaType, "F"),   # Iva Comprador
                 formatText(name[:40]), # Nombre
@@ -342,12 +342,12 @@ class EpsonPrinter(PrinterInterface):
         #                            [formatText(d)[:20]])
         for i, d in enumerate(description[:-1]):
             if self._getCommandIndex() == 0:
-                # tickets: enviar descripci�n complementaria con comando extra:
+                # tickets: enviar descripción complementaria con comando extra:
                 if d:
                     self._sendCommand(self.CMD_PRINT_TEXT_IN_FISCAL,
                                        [formatText(d)[:20]])
             else:
-                # completar linea descripci�n complementaria (facturas)
+                # completar linea descripción complementaria (facturas)
                 extraparams[-3 + i] = formatText(d)[:20]
         if self.USAR_IMPUESTOS_INTERNOS and self._currentDocument != self.CURRENT_DOC_TICKET:
             # agregar campos de acrecentamiento RNI e impuestos internos N(9.8)
@@ -371,7 +371,7 @@ class EpsonPrinter(PrinterInterface):
 
     def addAdditional(self, description, amount, iva, negative=False):
         """Agrega un adicional a la FC.
-            @param description  Descripci�n
+            @param description  Descripción
             @param amount       Importe (sin iva en FC A, sino con IVA)
             @param iva          Porcentaje de Iva
             @param negative True->Descuento, False->Recargo"""
@@ -406,21 +406,21 @@ class EpsonPrinter(PrinterInterface):
         return reply
 
     def addTax(self, tax_id, description, amount, rate=None):
-        """Agrega un otros tributos (i.e. percepci�n) a la FC.
-            @param description  Descripci�n
+        """Agrega un otros tributos (i.e. percepción) a la FC.
+            @param description  Descripción
             @param amount       Importe
             @param iva          Porcentaje de Iva (si corresponde)
-            @param tax_id       C�digo de Impuesto (ver 2da Generaci�n)
+            @param tax_id       Código de Impuesto (ver 2da Generación)
         """
         if tax_id in (5, 7, 8, 9):
-            perception = 'O'        # 0x4F  Otro tipo de Percepci�n (cod 9)
+            perception = 'O'        # 0x4F  Otro tipo de Percepción (cod 9)
         elif tax_id in (6, ):
             if rate and self.model == "epsonlx300+":
-                perception = 'T'    # 0x54  Percepci�n de IVA a una tasa de IVA (cod 6)
+                perception = 'T'    # 0x54  Percepción de IVA a una tasa de IVA (cod 6)
             else:
-                perception = 'I'    # 0x49  Percepci�n Global de IVA
+                perception = 'I'    # 0x49  Percepción Global de IVA
         else:
-            raise NotImplementedError("El c�digo de impuesto no est� implementado")
+            raise NotImplementedError("El código de impuesto no está implementado")
 
         amountStr = str(int(round(amount * 100, 0)))
         ivaStr = str(int(rate * 100)) if rate is not None else ""
@@ -455,8 +455,8 @@ class EpsonPrinter(PrinterInterface):
     def getLastNumber(self, letter):
         reply = self._sendCommand(self.CMD_STATUS_REQUEST, ["A"], True)
         if len(reply) < 3:
-            # La respuesta no es v�lida. Vuelvo a hacer el pedido y si hay
-            # alg�n error que se reporte como excepci�n
+            # La respuesta no es válida. Vuelvo a hacer el pedido y si hay
+            # algún error que se reporte como excepción
             reply = self._sendCommand(self.CMD_STATUS_REQUEST, ["A"], False)
         if letter == "A":
             return int(reply[6])
@@ -466,8 +466,8 @@ class EpsonPrinter(PrinterInterface):
     def getLastCreditNoteNumber(self, letter):
         reply = self._sendCommand(self.CMD_STATUS_REQUEST, ["A"], True)
         if len(reply) < 3:
-            # La respuesta no es v�lida. Vuelvo a hacer el pedido y si hay alg�n
-            # error que se reporte como excepci�n
+            # La respuesta no es válida. Vuelvo a hacer el pedido y si hay algún
+            # error que se reporte como excepción
             reply = self._sendCommand(self.CMD_STATUS_REQUEST, ["A"], False)
         if letter == "A":
             return int(reply[10])
@@ -497,8 +497,8 @@ class EpsonPrinter(PrinterInterface):
         01  Estado del impresor fiscal
         02  Estado del controlador fiscal
         03  Sin uso
-        04  cantidad de items de l�nea
-        05  Total de mercader�a o total a pagar (nnnnn.nn)
+        04  cantidad de items de línea
+        05  Total de mercadería o total a pagar (nnnnn.nn)
         06  Total de impuesto IVA (nnnnnnnnnn.nn)
         07  Total pago (nnnnnnnnnn.nn)
         08  Total de Impuestos Internos Porcentuales (nnnnnnnnnn.nn)
@@ -509,10 +509,10 @@ class EpsonPrinter(PrinterInterface):
         reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL[self._getCommandIndex()], [print_subtotal, "Subtotal"], True)
 
         if len(reply) < 3:
-            # La respuesta no es v�lida. Vuelvo a hacer el pedido y
-            #  si hay alg�n error que se reporte como excepci�n
+            # La respuesta no es válida. Vuelvo a hacer el pedido y
+            #  si hay algún error que se reporte como excepción
             reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL[self._getCommandIndex()], [print_subtotal, "Subtotal"], False)
-        return reply[3:]  # datos �tiles
+        return reply[3:]  # datos útiles
 
     def getWarnings(self):
         ret = []
@@ -520,7 +520,7 @@ class EpsonPrinter(PrinterInterface):
         printerStatus = reply[0]
         x = int(printerStatus, 16)
         if ((1 << 4) & x) == (1 << 4):
-            ret.append("Poco papel para la cinta de auditor�a")
+            ret.append("Poco papel para la cinta de auditoría")
         if ((1 << 5) & x) == (1 << 5):
             ret.append("Poco papel para comprobantes o tickets")
         return ret
@@ -537,7 +537,7 @@ class EpsonPrinter(PrinterInterface):
 
     def truncate_description(self, product_name):
         """
-        Divide la descripci�n en array de n strings
+        Divide la descripción en array de n strings
         """
         text = formatText(product_name[:78])
         n = 26
@@ -547,7 +547,7 @@ class EpsonPrinter(PrinterInterface):
 
     def get_extraparameters(self, description):
         """
-        Prepara el array de par�metros extras
+        Prepara el array de parámetros extras
         """
 
         extraparamenters = ['', '', '']
