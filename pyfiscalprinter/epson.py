@@ -201,8 +201,8 @@ class EpsonPrinter(PrinterInterface):
                 formatText(address[:self.ADDRESS_SIZE] or "-"), # Domicilio
                 formatText(address[self.ADDRESS_SIZE:self.ADDRESS_SIZE * 2]), # Domicilio 2da linea
                 formatText(address[self.ADDRESS_SIZE * 2:self.ADDRESS_SIZE * 3]), # Domicilio 3ra linea
-                (isCreditNote or self.ivaTypeMap.get(ivaType, "F") != "F") and "-" or "",
-                reference, # Remito primera linea - Es obligatorio si el cliente no es consumidor final
+                reference or ((isCreditNote or self.ivaTypeMap.get(ivaType, "F") != "F") and "-" or ""),
+                # Remito primera linea - Es obligatorio si el cliente no es consumidor final
                 "", # Remito segunda linea
                 "C", # No somos una farmacia
                 ]
@@ -224,8 +224,8 @@ class EpsonPrinter(PrinterInterface):
                 formatText(address[:self.ADDRESS_SIZE] or "-"), # Domicilio
                 formatText(address[self.ADDRESS_SIZE:self.ADDRESS_SIZE * 2]), # Domicilio 2da linea
                 formatText(address[self.ADDRESS_SIZE * 2:self.ADDRESS_SIZE * 3]), # Domicilio 3ra linea
-                (isCreditNote or self.ivaTypeMap.get(ivaType, "F") != "F") and "-" or "0",
-                reference, # Remito primera linea - Es obligatorio si el cliente no es consumidor final
+                reference or ((isCreditNote or self.ivaTypeMap.get(ivaType, "F") != "F") and "-" or "0"),
+                # Remito primera linea - Es obligatorio si el cliente no es consumidor final
                 "", # Remito segunda linea
                 "C", # No somos una farmacia
                 ]
