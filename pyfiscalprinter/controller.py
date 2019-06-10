@@ -130,16 +130,40 @@ class PyFiscalPrinter(Object):
         "Iniciar la comunicación con la instancia del controlador fiscal"
         if marca == 'epson':
             Printer = EpsonPrinter
+            print('--------------------------------------------')
+            print('--------------------------------------------')
+            print('--------------printer is EPSON--------------')
+            print('--------------printer--------------', Printer)
+            print('--------------------------------------------')
+            print('--------------------------------------------')
         elif marca == 'hasar':
             Printer = HasarPrinter
+            print('--------------------------------------------')
+            print('--------------------------------------------')
+            print('--------------printer is EPSON--------------')
+            print('--------------printer--------------', Printer)
+            print('--------------------------------------------')
+            print('--------------------------------------------')
         dummy = puerto == "dummy"
         # instanciar la impresora fiscal
         if not equipo:
             # conexión por puerto serie
             printer = Printer(deviceFile=puerto, model=modelo, dummy=dummy)
+            print('--------------------------------------------')
+            print('--------------------------------------------')
+            print('--------------NOT EQUIPO--------------')
+            print('--------------printer--------------', printer)
+            print('--------------------------------------------')
+            print('--------------------------------------------')
         else:
             # conexion por proxy TCP/IP
             printer = Printer(model=modelo, host=equipo, port=int(puerto), dummy=dummy)
+            print('--------------------------------------------')
+            print('--------------------------------------------')
+            print('--------------EQUIPO--------------')
+            print('--------------printer--------------', printer)
+            print('--------------------------------------------')
+            print('--------------------------------------------')
         self.printer = printer
         self.cbte_fiscal_map = {
             1: 'FA', 2: 'NDA', 3: 'NCA',
