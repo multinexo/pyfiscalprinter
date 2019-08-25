@@ -505,7 +505,7 @@ class EpsonPrinter(PrinterInterface):
         09  Total de Impuestos Internos Fijos (nnnnnnnnnn.nn)
         10  Monto Neto o Total facturado sin Impuestos (nnnnnnnnnn.nn)
         """
-        print('---------------------- inside get subtotal ----------------------')
+        print('---------------------- inside get subtotal EPSON ----------------------')
         print_subtotal = "P" if print_subtotal is True else "N"
         reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL[self._getCommandIndex()], [print_subtotal, "Subtotal"], True)
 
