@@ -520,7 +520,7 @@ class HasarPrinter(PrinterInterface):
         return False
 
     def getSubtotal(self, print_subtotal=True):
-        # TODO: two following lines were the original code, 3rd is copied
+        # NOTE: two following lines were the original code
         # print_subtotal = "P" if print_subtotal is True else "N"
         # reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL, [print_subtotal, "Subtotal"], True)
         reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL, ["P" if print_subtotal else "O", "Subtotal", "1"])
@@ -528,7 +528,7 @@ class HasarPrinter(PrinterInterface):
         if len(reply) < 3:
             # La respuesta no es válida. Vuelvo a hacer el pedido y
             #  si hay algún error que se reporte como excepción
-            # TODO: following line was the original code, 2nd is copied
+            # NOTE: following line was the original code
             # reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL, [print_subtotal, "Subtotal"], False)
             reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL, ["P" if print_subtotal else "O", "Subtotal", "0"])
         return reply[2:]
