@@ -520,7 +520,6 @@ class HasarPrinter(PrinterInterface):
         return False
 
     def getSubtotal(self, print_subtotal=True):
-        print('---------------------- inside get subtotal HASAR ----------------------')
         # TODO: two following lines were the original code, 3rd is copied
         # print_subtotal = "P" if print_subtotal is True else "N"
         # reply = self._sendCommand(self.CMD_PRINT_SUBTOTAL, [print_subtotal, "Subtotal"], True)
