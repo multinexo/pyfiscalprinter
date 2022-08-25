@@ -68,6 +68,15 @@ class PrinterInterface:
         DOC_TYPE_CEDULA: 'CED',
         DOC_TYPE_SIN_CALIFICADOR: 'S/C'}
 
+    docTypeNamesEpsonExt = {
+        DOC_TYPE_CUIT: 'T',
+        DOC_TYPE_LIBRETA_ENROLAMIENTO: 'E',
+        DOC_TYPE_LIBRETA_CIVICA: 'V',
+        DOC_TYPE_DNI: 'D',
+        DOC_TYPE_PASAPORTE: 'P',
+        DOC_TYPE_CEDULA: 'C',
+        DOC_TYPE_SIN_CALIFICADOR: ''}
+
     IVA_TYPE_RESPONSABLE_INSCRIPTO = 'I'
     IVA_TYPE_RESPONSABLE_NO_INSCRIPTO = 'N'
     IVA_TYPE_EXENTO = 'E'
