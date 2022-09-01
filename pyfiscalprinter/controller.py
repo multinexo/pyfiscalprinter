@@ -209,7 +209,7 @@ class PyFiscalPrinter(Object):
         # mapear el numero de documento según RG1361
         doc_fiscal = self.doc_fiscal_map[int(tipo_doc)]
         # cancelar y volver a un estado conocido
-        # printer.cancelAnyDocument()
+        printer.cancelAnyDocument()
         # enviar texto de cabecera y pie de pagina:
         printer.setHeader(self.header)
         printer.setTrailer(self.trailer)

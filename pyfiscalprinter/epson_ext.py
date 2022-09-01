@@ -467,18 +467,9 @@ class EpsonExtPrinter(PrinterInterface):
             return int(reply[11])
 
     def cancelAnyDocument(self):
+
         try:
-            self._sendCommand(self.commands.CMD_ADD_PAYMENT[0], ["Cancelar", "0", 'C'])
-            return True
-        except:
-            pass
-        try:
-            self._sendCommand(self.commands.CMD_ADD_PAYMENT[1], ["Cancelar", "0", 'C'])
-            return True
-        except:
-            pass
-        try:
-            self._sendCommand(self.commands.CMD_CLOSE_NON_FISCAL_RECEIPT, ["T"])
+            self._sendCommand(self.commands['CMD_CANCEL_DOCUMENT'][self._getCommandIndex()], [])
             return True
         except:
             pass
