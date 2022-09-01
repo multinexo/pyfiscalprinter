@@ -6,6 +6,7 @@ import sys
 import SocketServer
 import socket
 import traceback
+import os
 
 def debugEnabled( *args ):
     print >>sys.stderr, " ".join( map(str, args) )

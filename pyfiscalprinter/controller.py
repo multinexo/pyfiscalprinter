@@ -63,6 +63,7 @@ from functools import wraps
 # Drivers:
 
 from epson import EpsonPrinter
+from epson_ext import EpsonExtPrinter
 from hasar import HasarPrinter
 
 try:
@@ -126,10 +127,13 @@ class PyFiscalPrinter(Object):
 
     @inicializar_y_capturar_excepciones
     @method(DBUS_IFACE, in_signature='ssss', out_signature='b')
-    def Conectar(self, marca="epson", modelo="320", puerto="COM1", equipo=None):
+    def Conectar(self, marca="epson", modelo="tm-t900-af", puerto="COM1", equipo=None):
         "Iniciar la comunicación con la instancia del controlador fiscal"
         if marca == 'epson':
-            Printer = EpsonPrinter
+            if modelo == "tm-t900-af":
+                Printer = EpsonExtPrinter
+            else:
+                Printer = EpsonPrinter
         elif marca == 'hasar':
             Printer = HasarPrinter
         dummy = puerto == "dummy"
@@ -317,7 +321,7 @@ class PyFiscalPrinter(Object):
         # self.printer.closeDocument() <=== ours (replaced two following lines)
         nro = self.printer.closeDocument()
         self.factura["nro_cbte"] = nro
-        return True
+        return nro
 
     @inicializar_y_capturar_excepciones
     @method(DBUS_IFACE, in_signature='v', out_signature='i')
