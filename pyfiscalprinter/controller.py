@@ -220,7 +220,6 @@ class PyFiscalPrinter(Object):
             else:
                 ret = printer.openTicket()
         elif cbte_fiscal.startswith("F"):
-	    print('aca')
             ret = printer.openBillTicket(letra_cbte, nombre_cliente, domicilio_cliente,
                                          nro_doc, doc_fiscal, pos_fiscal)
         elif cbte_fiscal.startswith("ND"):

@@ -8,7 +8,6 @@ class EpsonFiscalExtDriver(EpsonFiscalDriver):
 
     def __init__(self, deviceFile, speed=9600):
         connect = True
-	print('(EpsonExt) Entre por lo tanto me toma lo que estoy haciendo')
         while connect:
             try:
                 os.system("./fiscalproxy --comm-port=1 -p 3000 -l &")
@@ -34,7 +33,7 @@ class EpsonFiscalExtDriver(EpsonFiscalDriver):
 
         url = 'http://localhost:3000'
         headers = {'Content-Type': 'text/plain'}
-	print('Comando: ', message)
+        print('Comando: ', message)
         ret = ''
         while ret == '':
             try:
@@ -45,6 +44,6 @@ class EpsonFiscalExtDriver(EpsonFiscalDriver):
                 time.sleep(5)
                 print("Was a nice sleep, now let me continue...")
                 continue
-	print('Respuesta: ', ret.content)
+        print('Respuesta: ', ret.content)
         return self._parseReply( ret.content, skipStatusErrors )
 
