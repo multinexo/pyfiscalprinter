@@ -35,7 +35,6 @@ class CommandRepository:
 
         dictionary = {
             'epson_ext': self.CMD_EPSON_EXT,
-            'epson': self.CMD_EPSON
         }
 
 
