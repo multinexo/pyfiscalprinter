@@ -450,25 +450,33 @@ class EpsonExtPrinter(PrinterInterface):
         credit_documents_b = 0
         credit_total_b = 0.00
         credit_tax_b = 0.00
+        sales_first_a = '0000000'
+        sales_first_b = '0000000'
+        credit_first_a = '00000000'
+        credit_first_b = '00000000'
 
         if '081' in info_close_daily['arrayConjuntosComprobantesFiscales']:
             sales_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['cantidadComprobantes']
             sales_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['ultimoNumeroComprobante']
+            sales_first_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['primerNumeroComprobante']
             sales_total_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['081']['importeTotalComprobantes'])
             sales_tax_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['081']['arraySubtotalesIVA']['subtotalIVA']['importe'])
         if '082' in info_close_daily['arrayConjuntosComprobantesFiscales']:
             sales_documents_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['cantidadComprobantes']
             sales_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['ultimoNumeroComprobante']
+            sales_first_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['primerNumeroComprobante']
             sales_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['082']['importeTotalComprobantes'])
             sales_tax_b = 0.00
         if '112' in info_close_daily['arrayConjuntosComprobantesFiscales']:
             credit_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['cantidadComprobantes']
             credit_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['ultimoNumeroComprobante']
+            credit_first_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['primerNumeroComprobante']
             credit_total_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['112']['importeTotalComprobantes'])
             credit_tax_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['112']['arraySubtotalesIVA']['subtotalIVA']['importe'])
         if '113' in info_close_daily['arrayConjuntosComprobantesFiscales']:
             credit_documents_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['cantidadComprobantes']
             credit_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['ultimoNumeroComprobante']
+            credit_first_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['primerNumeroComprobante']
             credit_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['113']['importeTotalComprobantes'])
             credit_tax_b = 0.00
         if xml == 'empty':
@@ -491,6 +499,10 @@ class EpsonExtPrinter(PrinterInterface):
                 int(credit_documents_a) + int(credit_documents_b),
                 credit_total_a + credit_total_b,
                 credit_tax_a + credit_tax_b,
+                sales_first_a,
+                sales_first_b,
+                credit_first_a,
+                credit_first_b,
             ]
 
         return response
@@ -498,85 +510,15 @@ class EpsonExtPrinter(PrinterInterface):
     def dailyClose(self, type):
         if type == 'Z':
             reply = self._sendCommand(self.commands['CMD_DAILY_CLOSE'], [])
-            try:
-                receipt_number = reply[2]
-                self._sendCommand('0813|0000', [str(receipt_number), str(receipt_number)])
-                reply_xml = self._sendCommand('0814|0000', [])
-                try:
-                    xml = reply_xml[2]
-                    info_close_daily = self.extractInfoToXml(xml + '</arrayCierresZ></comprobanteAuditoria></arrayComprobantesAuditoria></tns:auditoria')
-                except Exception as e:
-                    xml = 'empty'
-            except:
-                receipt_number = "null"
-            self._sendCommand('0815|0000', [])
         if type == 'X':
             reply = self._sendCommand(self.commands['CMD_TELLER_EXIT'], [])
 
-        if receipt_number == "null" or xml == 'empty':
-            response = []
-        else:
-            for x in range(1, 7):
-                if 'conjuntoComprobantesFiscales' + str(x) in info_close_daily['arrayConjuntosComprobantesFiscales']:
-                    info_close_daily['arrayConjuntosComprobantesFiscales'] = self.changeKeyToDictForDocumentId('conjuntoComprobantesFiscales' + str(x), info_close_daily['arrayConjuntosComprobantesFiscales'])
-        canceled_qty = info_close_daily['cantidadComprobantesCancelados']
-        sales_documents_a = 0
-        sales_documents_b = 0
-        sales_last_a = '0000000'
-        sales_last_b = '0000000'
-        sales_total_a = 0
-        sales_total_b = 0
-        sales_tax_a = 0.00
-        sales_tax_b = 0.00
-        credit_last_a = '00000000'
-        credit_documents_a = 0
-        credit_total_a = 0.00
-        credit_tax_a = 0.00
-        credit_last_b = '00000000'
-        credit_documents_b = 0
-        credit_total_b = 0.00
-        credit_tax_b = 0.00
-
-        if '081' in info_close_daily['arrayConjuntosComprobantesFiscales']:
-            sales_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['cantidadComprobantes']
-            sales_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['ultimoNumeroComprobante']
-            sales_total_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['081']['importeTotalComprobantes'])
-            sales_tax_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['081']['arraySubtotalesIVA']['subtotalIVA']['importe'])
-        if '082' in info_close_daily['arrayConjuntosComprobantesFiscales']:
-            sales_documents_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['cantidadComprobantes']
-            sales_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['ultimoNumeroComprobante']
-            sales_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['082']['importeTotalComprobantes'])
-            sales_tax_b = 0.00
-        if '112' in info_close_daily['arrayConjuntosComprobantesFiscales']:
-            credit_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['cantidadComprobantes']
-            credit_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['ultimoNumeroComprobante']
-            credit_total_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['112']['importeTotalComprobantes'])
-            credit_tax_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['112']['arraySubtotalesIVA']['subtotalIVA']['importe'])
-        if '113' in info_close_daily['arrayConjuntosComprobantesFiscales']:
-            credit_documents_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['cantidadComprobantes']
-            credit_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['ultimoNumeroComprobante']
-            credit_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['113']['importeTotalComprobantes'])
-            credit_tax_b = 0.00
-        response = [
-            str(receipt_number).zfill(8),
-            canceled_qty,
-            '0',
-            '0',
-            sales_documents_a,
-            sales_documents_b,
-            sales_last_b,
-            sales_total_a + sales_total_b,
-            sales_tax_a + sales_tax_b,
-            '0',
-            sales_last_a,
-            credit_last_a,
-            credit_last_b,
-            int(credit_documents_a) + int(credit_documents_b),
-            credit_total_a + credit_total_b,
-            credit_tax_a + credit_tax_b,
-        ]
-
-        return response
+        try:
+            return [
+                str(reply[2]).zfill(8)
+            ]
+        except:
+            return []
 
     def auditByDate(self, date_from, date_to, type):
         reply = self._sendCommand(self.commands.CMD_AUDIT_BY_DATE, [date_from, date_to, type])
