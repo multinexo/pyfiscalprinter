@@ -224,25 +224,15 @@ class EpsonExtPrinter(PrinterInterface):
         quantityStr = str(int(quantity * 10000))
         ivaStr = str(int(iva * 100))
         codigo_frente_iva = "7"
-        if self._currentDocumentType != 'A':
-            ivaStr = '0000'
-            codigo_frente_iva = "1"
-            # enviar con el iva incluido
-            if self._currentDocument == self.commands['CURRENT_DOC_CREDIT_TICKET']:
-                # nota de crédito?
-                priceUnitStr = str(int(floor(price * 10000)))
-            else:
-                priceUnitStr = str(int(round(price * 10000, 0)))
+        net = price / ((100.0 + iva) / 100.0)
+        if round_up:
+            net = self.float_round_up(net, 2)
+        # enviar sin el iva (factura A)
+        if self._currentDocument == self.commands['CURRENT_DOC_CREDIT_TICKET']:
+            # nota de crédito?
+            priceUnitStr = str(int(floor(net * 10000)))
         else:
-            net = price / ((100.0 + iva) / 100.0)
-            if round_up:
-                net = self.float_round_up(net, 2)
-            # enviar sin el iva (factura A)
-            if self._currentDocument == self.commands['CURRENT_DOC_CREDIT_TICKET']:
-                # nota de crédito?
-                priceUnitStr = str(int(floor(net * 10000)))
-            else:
-                priceUnitStr = str(int(round(net * 10000, 0)))
+            priceUnitStr = str(int(round(net * 10000, 0)))
 
         parameters = [
             "",
@@ -286,14 +276,14 @@ class EpsonExtPrinter(PrinterInterface):
         return reply
 
     def addPayment(self, description, payment):
-        paymentStr = str(int(payment * 10000))
+        paymentStr = str(int(payment * 100))
         parameters = [
             formatText(description)[:20],
             "",
             "",
             "",
             "",
-            "1",
+            "8",
             paymentStr
         ]
         status = self._sendCommand(self.commands['CMD_ADD_PAYMENT'][self._getCommandIndex()], parameters)
@@ -313,21 +303,11 @@ class EpsonExtPrinter(PrinterInterface):
 
         if negative:
             command = self.commands['CMD_PRINT_DISCOUNT']
-
-        if self._currentDocumentType != 'A':
-            ivaStr = '0000'
-            codigo_frente_iva = "1"
-            # enviar con el iva incluido
-            if self._currentDocument == self.commands['CURRENT_DOC_CREDIT_TICKET']:
-                priceUnitStr = str(int(ceil(priceUnit * 10000)))
-            else:
-                priceUnitStr = str(int(round(priceUnit * 10000, 0)))
+        # enviar sin el iva (factura A)
+        if self._currentDocument == self.commands['CURRENT_DOC_CREDIT_TICKET']:
+            priceUnitStr = str(int(ceil((priceUnit / ((100.0 + iva) / 100)) * 10000)))
         else:
-            # enviar sin el iva (factura A)
-            if self._currentDocument == self.commands['CURRENT_DOC_CREDIT_TICKET']:
-                priceUnitStr = str(int(ceil((priceUnit / ((100.0 + iva) / 100)) * 10000)))
-            else:
-                priceUnitStr = str(int(round((priceUnit / ((100.0 + iva) / 100)) * 10000, 0)))
+            priceUnitStr = str(int(round((priceUnit / ((100.0 + iva) / 100)) * 10000, 0)))
 
         parameters = [
             "",
@@ -427,61 +407,65 @@ class EpsonExtPrinter(PrinterInterface):
         try:
             xml = reply_xml[2]
             info_close_daily = self.extractInfoToXml(xml + '</arrayCierresZ></comprobanteAuditoria></arrayComprobantesAuditoria></tns:auditoria')
+            emission_date = re.findall(r'(<fechaHoraEmisionCierreZ>(.*)</fechaHoraEmisionCierreZ>)', xml + '</arrayCierresZ></comprobanteAuditoria></arrayComprobantesAuditoria></tns:auditoria')
+            emission_date = emission_date[0][1].replace('T', ' ')
         except Exception as e:
             xml = 'empty'
         self._sendCommand('0815|0000', [])
-        for x in range(1, 7):
-            if 'conjuntoComprobantesFiscales' + str(x) in info_close_daily['arrayConjuntosComprobantesFiscales']:
-                info_close_daily['arrayConjuntosComprobantesFiscales'] = self.changeKeyToDictForDocumentId('conjuntoComprobantesFiscales' + str(x), info_close_daily['arrayConjuntosComprobantesFiscales'])
-        canceled_qty = info_close_daily['cantidadComprobantesCancelados']
-        sales_documents_a = 0
-        sales_documents_b = 0
-        sales_last_a = '0000000'
-        sales_last_b = '0000000'
-        sales_total_a = 0
-        sales_total_b = 0
-        sales_tax_a = 0.00
-        sales_tax_b = 0.00
-        credit_last_a = '00000000'
-        credit_documents_a = 0
-        credit_total_a = 0.00
-        credit_tax_a = 0.00
-        credit_last_b = '00000000'
-        credit_documents_b = 0
-        credit_total_b = 0.00
-        credit_tax_b = 0.00
-        sales_first_a = '0000000'
-        sales_first_b = '0000000'
-        credit_first_a = '00000000'
-        credit_first_b = '00000000'
 
-        if '081' in info_close_daily['arrayConjuntosComprobantesFiscales']:
-            sales_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['cantidadComprobantes']
-            sales_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['ultimoNumeroComprobante']
-            sales_first_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['primerNumeroComprobante']
-            sales_total_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['081']['importeTotalComprobantes'])
-            sales_tax_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['081']['arraySubtotalesIVA']['subtotalIVA']['importe'])
-        if '082' in info_close_daily['arrayConjuntosComprobantesFiscales']:
-            sales_documents_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['cantidadComprobantes']
-            sales_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['ultimoNumeroComprobante']
-            sales_first_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['primerNumeroComprobante']
-            sales_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['082']['importeTotalComprobantes'])
-            sales_tax_b = 0.00
-        if '112' in info_close_daily['arrayConjuntosComprobantesFiscales']:
-            credit_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['cantidadComprobantes']
-            credit_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['ultimoNumeroComprobante']
-            credit_first_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['primerNumeroComprobante']
-            credit_total_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['112']['importeTotalComprobantes'])
-            credit_tax_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['112']['arraySubtotalesIVA']['subtotalIVA']['importe'])
-        if '113' in info_close_daily['arrayConjuntosComprobantesFiscales']:
-            credit_documents_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['cantidadComprobantes']
-            credit_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['ultimoNumeroComprobante']
-            credit_first_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['primerNumeroComprobante']
-            credit_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['113']['importeTotalComprobantes'])
-            credit_tax_b = 0.00
         if xml == 'empty':
             response = []
         else:
+            for x in range(1, 7):
+                if 'conjuntoComprobantesFiscales' + str(x) in info_close_daily['arrayConjuntosComprobantesFiscales']:
+                    info_close_daily['arrayConjuntosComprobantesFiscales'] = self.changeKeyToDictForDocumentId('conjuntoComprobantesFiscales' + str(x), info_close_daily['arrayConjuntosComprobantesFiscales'])
+            canceled_qty = info_close_daily['cantidadComprobantesCancelados']
+            sales_documents_a = 0
+            sales_documents_b = 0
+            sales_last_a = '0000000'
+            sales_last_b = '0000000'
+            sales_total_a = 0
+            sales_total_b = 0
+            sales_tax_a = 0.00
+            sales_tax_b = 0.00
+            credit_last_a = '00000000'
+            credit_documents_a = 0
+            credit_total_a = 0.00
+            credit_tax_a = 0.00
+            credit_last_b = '00000000'
+            credit_documents_b = 0
+            credit_total_b = 0.00
+            credit_tax_b = 0.00
+            sales_first_a = '0000000'
+            sales_first_b = '0000000'
+            credit_first_a = '00000000'
+            credit_first_b = '00000000'
+
+            if '081' in info_close_daily['arrayConjuntosComprobantesFiscales']:
+                sales_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['cantidadComprobantes']
+                sales_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['ultimoNumeroComprobante']
+                sales_first_a = info_close_daily['arrayConjuntosComprobantesFiscales']['081']['primerNumeroComprobante']
+                sales_total_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['081']['importeTotalComprobantes'])
+                sales_tax_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['081']['arraySubtotalesIVA']['subtotalIVA']['importe'])
+            if '082' in info_close_daily['arrayConjuntosComprobantesFiscales']:
+                sales_documents_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['cantidadComprobantes']
+                sales_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['ultimoNumeroComprobante']
+                sales_first_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['primerNumeroComprobante']
+                sales_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['082']['importeTotalComprobantes'])
+                sales_tax_b = 0.00
+            if '112' in info_close_daily['arrayConjuntosComprobantesFiscales']:
+                credit_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['cantidadComprobantes']
+                credit_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['ultimoNumeroComprobante']
+                credit_first_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['primerNumeroComprobante']
+                credit_total_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['112']['importeTotalComprobantes'])
+                credit_tax_a = float(info_close_daily['arrayConjuntosComprobantesFiscales']['112']['arraySubtotalesIVA']['subtotalIVA']['importe'])
+            if '113' in info_close_daily['arrayConjuntosComprobantesFiscales']:
+                credit_documents_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['cantidadComprobantes']
+                credit_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['ultimoNumeroComprobante']
+                credit_first_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['primerNumeroComprobante']
+                credit_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['113']['importeTotalComprobantes'])
+                credit_tax_b = 0.00
+
             response = [
                 str(receipt_number).zfill(8),
                 canceled_qty,
@@ -503,6 +487,7 @@ class EpsonExtPrinter(PrinterInterface):
                 sales_first_b,
                 credit_first_a,
                 credit_first_b,
+                emission_date
             ]
 
         return response
