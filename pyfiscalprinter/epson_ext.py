@@ -452,7 +452,10 @@ class EpsonExtPrinter(PrinterInterface):
                 sales_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['ultimoNumeroComprobante']
                 sales_first_b = info_close_daily['arrayConjuntosComprobantesFiscales']['082']['primerNumeroComprobante']
                 sales_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['082']['importeTotalComprobantes'])
-                sales_tax_b = 0.00
+                try:
+                    sales_tax_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['082']['arraySubtotalesIVA']['subtotalIVA']['importe'])
+                except:
+                    sales_tax_b = 0.00
             if '112' in info_close_daily['arrayConjuntosComprobantesFiscales']:
                 credit_documents_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['cantidadComprobantes']
                 credit_last_a = info_close_daily['arrayConjuntosComprobantesFiscales']['112']['ultimoNumeroComprobante']
@@ -464,7 +467,10 @@ class EpsonExtPrinter(PrinterInterface):
                 credit_last_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['ultimoNumeroComprobante']
                 credit_first_b = info_close_daily['arrayConjuntosComprobantesFiscales']['113']['primerNumeroComprobante']
                 credit_total_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['113']['importeTotalComprobantes'])
-                credit_tax_b = 0.00
+                try:
+                    credit_tax_b = float(info_close_daily['arrayConjuntosComprobantesFiscales']['113']['arraySubtotalesIVA']['subtotalIVA']['importe'])
+                except:
+                    credit_tax_b = 0.00
 
             response = [
                 str(receipt_number).zfill(8),
