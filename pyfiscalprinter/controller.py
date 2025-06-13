@@ -366,6 +366,12 @@ class PyFiscalPrinter(Object):
         "Agrega un adicional o Bonificacion"
         return self.printer.addAdditional(descripcion, monto, iva, negativo)
 
+    # El siguiente método no existe en el repo original
+    @inicializar_y_capturar_excepciones
+    @method(DBUS_IFACE, in_signature='', out_signature='')
+    def AgregarPercepcion(self, descripcion, monto, iva, negativo=False):
+        "Agrega un adicional o Bonificacion"
+	return self.printer.addPerception(descripcion, monto, iva, negativo)
 
 if __name__ == '__main__':
 
